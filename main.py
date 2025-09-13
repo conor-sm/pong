@@ -103,7 +103,7 @@ class AI:
     def update(self, ball):
         if easy_mode:
             self.ai_speed = 4
-        if hard_mode:
+        elif hard_mode:
             self.ai_speed = 4.5
 
         if self.ai_rect.y < 35:
@@ -128,11 +128,19 @@ ball = Ball(400, 225, 10, 5, 5)
 def ai_won_screen():
     screen.fill((0, 0, 0))
     lost_txt = large_font.render("You LOST", True, (255, 0, 0))
-    lost_prompt = small_font.rendr("ENTER 1 - easy mode or 2 - hard mode")
+    lost_prompt = small_font.render("ENTER 1 - easy mode or 2 - hard mode", True, (255, 0, 0))
     screen.blit(lost_txt, ((WINDOW_WIDTH - lost_txt.get_width()) // 2, ((WINDOW_HEIGHT - lost_txt.get_height()) // 2)))
-    screen.blit(lost_prompt, ((WINDOW_WIDTH - lost_prompt.get_width()) // 2, ((WINDOW_HEIGHT - lost_prompt.get_height()) // 2)))
+    screen.blit(lost_prompt, ((WINDOW_WIDTH - lost_prompt.get_width()) // 2, (((WINDOW_HEIGHT - lost_prompt.get_height()) // 2) + 50)))
+
+def user_won_screen():
+    screen.fill((0, 0, 0))
+    won_txt = large_font.render("You WON", True, (0, 255, 0))
+    won_prompt = small_font.render("ENTER 1 - easy mode or 2 - hard mode", True, (0, 255, 0))
+    screen.blit(won_txt, ((WINDOW_WIDTH - won_txt.get_width()) // 2, ((WINDOW_HEIGHT - won_txt.get_height()) // 2)))
+    screen.blit(won_prompt, ((WINDOW_WIDTH - won_prompt.get_width()) // 2, (((WINDOW_HEIGHT - won_prompt.get_height()) // 2) + 50)))
+
 def game():
-    global user_score, ai_score
+    global user_score, ai_score, user_won, ai_won, game_active
     player.draw(screen)
     player.update()
     ball.move()
@@ -155,15 +163,18 @@ def game():
     screen.blit(user_score_txt, (10, 10))
     screen.blit(ai_score_txt, ((WINDOW_WIDTH -ai_score_txt.get_width() - 10 ), 10)) 
 
-    if user_score = 10 and ai_score < 10:
+    if user_score == 10 and ai_score < 10:
         user_won = True
-        user_won_screen()
-    if ai_score = 10 and user_score < 10:
+        game_active = False
+    elif ai_score == 10 and user_score < 10:
         ai_won = True
-        ai_won_screen()
+        game_active = False
 
 def menu():
+    global user_score, ai_score
     screen.fill((0, 0, 0))
+    user_score = 0
+    ai_score = 0
     line_one = large_font.render("Pong", True, (255, 100, 255))
     line_two = small_font.render("ENTER 1 - easy mode or 2 - hard mode", True, (255, 100, 255))
     screen.blit(line_one, ((WINDOW_WIDTH - line_one.get_width()) // 2, ((WINDOW_HEIGHT - line_one.get_height()) // 2)))
@@ -184,30 +195,48 @@ while running:
                 menu_active = False
                 game_active = True
                 easy_mode = True
+                hard_mode = False
+                user_score = 0
+                ai_score = 0
             if event.key == pygame.K_2:
                 menu_active = False
                 game_active = True
                 hard_mode = True
+                easy_mode = False
+                user_score = 0
+                ai_score = 0
 
-        if event.type == pygame.KEYDOWN and ai_won or event.type == pygame.KEYDWON and user_won:
+        if event.type == pygame.KEYDOWN and (ai_won or user_won):
             if event.key == pygame.K_1:
                 menu_active = False
                 game_active = True
                 easy_mode = True
+                hard_mode = False
                 ai_won = False
                 user_won = False
+                user_score = 0
+                ai_score = 0
             if event.key == pygame.K_2:
                 menu_active = False
                 game_active = True
                 hard_mode = True
+                easy_mode = False
                 ai_won = False
                 user_won = False
+                user_score = 0
+                ai_score = 0
     
     if menu_active:
         menu()
         
-    if game_active:
+    elif game_active:
         game()
+
+    elif user_won:
+        user_won_screen()
+    
+    elif ai_won:
+        ai_won_screen()
 
     clock.tick(60)
     pygame.display.update()
