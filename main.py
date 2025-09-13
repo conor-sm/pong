@@ -76,52 +76,61 @@ class Ball:
     def get_rect(self):
         return pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
 
-    def check_collisions(self, player):
+    def check_collisions(self, player, AI):
         global user_score, ai_score
         ball_rect = self.get_rect()
         if ball_rect.colliderect(player.paddle_rect):
+            self.speed_x *= -1
+
+        if ball_rect.colliderect(AI.ai_rect):
             self.speed_x *= -1
 
         if ball_rect.x <= 0:
             ai_score +=1
 
         if ball_rect.x >= 450:
-            player_score +=1
+            user_score +=1
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 100, 255), (self.x, self.y), self.radius)
 
 class AI:
-    def __init__(self)
-        self.ai_rect = pygame.Rect(50, 200, 10, 100)
-        self.ai_speed = 5
+    def __init__(self, y):
+        self.ai_rect = pygame.Rect(850, y, 10, 100)
+        self.ai_speed = 4
 
     def update(self, ball):
         
-        if self.paddle_rect.y < 0:
-            self.paddle_rect.y = 0
+        if self.ai_rect.y < 0:
+            self.ai_rect.y = 0
 
-        if self.paddle_rect.y > 350:
-            self.paddle_rect.y = 350
+        if self.ai_rect.y > 350:
+            self.ai_rect.y = 350
 
-        if ball.get
+        if ball.y < self.ai_rect.y:
+            self.ai_rect.y -= self.ai_speed 
+        
+        if ball.y > self.ai_rect.y + self.ai_rect.height:
+            self.ai_rect.y += self.ai_speed
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (255, 100, 255), self.paddle_rect)
+        pygame.draw.rect(screen, (255, 100, 255), self.ai_rect)
 
 player = Player()
-ai = AI()
+ai = AI(200)
 ball = Ball(400, 225, 10, 5, 5)
 
 def game():
     player.draw(screen)
     player.update()
     ball.move()
-    ball.check_collisions(player)
+    ball.check_collisions(player, ai)
     ball.bounce(WINDOW_WIDTH, WINDOW_HEIGHT)
     if ball.check_out_bounds(WINDOW_WIDTH):
         ball.reset(WINDOW_WIDTH, WINDOW_HEIGHT)
     ball.draw(screen)
+    ai.update(ball)
+    ai.draw(screen)
 
 def menu():
     screen.fill((0, 0, 0))
