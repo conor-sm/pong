@@ -11,6 +11,9 @@ menu_active = True
 game_over = False
 game_active = False
 
+user_score = 0
+ai_score = 0
+
 large_font = pygame.font.Font('font.otf', 42)
 small_font = pygame.font.Font('font.otf', 32)
 
@@ -69,12 +72,42 @@ class Ball:
         self.y = SCREEN_HEIGHT // 2
         self.speed_x = random.choice([-5, 5])
         self.speed_y = random.choice([-5, 5])
+
+    def get_rect(self):
+        return pygame.Rect(self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2)
+
+    def check_collisions(self, player):
+        global user_score, ai_score
+        ball_rect = self.get_rect()
+        if ball_rect.colliderect(player.paddle_rect):
+            self.speed_x *= -1
+
+        if ball_rect.x <= 0:
+            ai_score +=1
+
+        if ball_rect.x >= 450:
+            player_score +=1
+
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 100, 255), (self.x, self.y), self.radius)
 
 class AI:
-    def __init__(self):
-        self.text = "Hello World"
+    def __init__(self)
+        self.ai_rect = pygame.Rect(50, 200, 10, 100)
+        self.ai_speed = 5
+
+    def update(self, ball):
+        
+        if self.paddle_rect.y < 0:
+            self.paddle_rect.y = 0
+
+        if self.paddle_rect.y > 350:
+            self.paddle_rect.y = 350
+
+        if ball.get
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, (255, 100, 255), self.paddle_rect)
 
 player = Player()
 ai = AI()
@@ -84,6 +117,7 @@ def game():
     player.draw(screen)
     player.update()
     ball.move()
+    ball.check_collisions(player)
     ball.bounce(WINDOW_WIDTH, WINDOW_HEIGHT)
     if ball.check_out_bounds(WINDOW_WIDTH):
         ball.reset(WINDOW_WIDTH, WINDOW_HEIGHT)
